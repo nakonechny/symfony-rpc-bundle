@@ -45,7 +45,7 @@ class Server implements ServerInterface
             $methodCall = $this->impl->createMethodCall($request);
             $methodResponse = $this->_handle($methodCall);
         } catch (\Exception $e) {
-            $methodResponse = new MethodFault($e);
+            $methodResponse = new MethodFault($e, $methodCall->getCallId());
         }
 
         return $this->impl->createHttpResponse($methodResponse);
@@ -60,8 +60,9 @@ class Server implements ServerInterface
     {
         $response = $this->call($methodCall->getMethodName(), $methodCall->getParameters());
 
-        if(!($response instanceof MethodResponse))
-            $response = new MethodReturn($response);
+        if (!($response instanceof MethodResponse)) {
+            $response = new MethodReturn($response, null, $methodCall->getCallId());
+        }
 
         return $response;
     }
